@@ -82,16 +82,20 @@ import {
 import type { EntryRow } from '@/data/types'
 
 const meta = moduleMeta('householdservice')
-const columns = ["服务单号", "报修用户", "服务内容", "受理人", "上门时间", "处理结果", "回访日期", "服务状态"]
-const actions = ["受理报修", "登记处理", "完成回访"]
-const statuses = ["待受理", "已安排", "已处理", "已回访"]
-const stats = [{"label": "待受理服务单", "value": 0}, {"label": "已处理服务单", "value": 0}, {"label": "待回访服务单", "value": 0}]
+const columns = meta.fields
+const actions = meta.actions
+const statuses = meta.statuses
 
 const rows = ref<EntryRow[]>([])
 const total = ref(0)
 const errorMessage = ref('')
 const filters = ref<Record<string, string>>({})
-const filterFields = columns.slice(0, 3)
+const filterFields = columns.slice(0, 4)
+const stats = computed(() => [
+  { label: '待受理服务单', value: rows.value.filter((row) => row.status === '待受理').length },
+  { label: '已处理服务单', value: rows.value.filter((row) => row.status === '已处理').length },
+  { label: '待回访服务单', value: rows.value.filter((row) => row.status === '已处理').length },
+])
 const statusSummary = computed(() =>
   statuses.map((status: string) => ({
     status,
